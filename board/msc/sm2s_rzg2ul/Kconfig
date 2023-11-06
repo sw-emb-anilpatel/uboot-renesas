@@ -1,0 +1,11 @@
+config SYS_SOC
+	default "rmobile"
+
+config SYS_BOARD
+	default "sm2s_rzg2ul"
+
+config SYS_VENDOR
+	default "msc"
+
+config SYS_CONFIG_NAME
+	default "msc_sm2s_rzg2ul"
