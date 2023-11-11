@@ -8,4 +8,4 @@ config SYS_VENDOR
 	default "msc"
 
 config SYS_CONFIG_NAME
-	default "msc_sm2s_rzg2ul"
+	default "msc-sm2s-rzg2ul"
