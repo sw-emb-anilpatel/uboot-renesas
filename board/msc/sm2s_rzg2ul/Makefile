@@ -9,5 +9,5 @@
 ifdef CONFIG_SPL_BUILD
 obj-y	:= ../../renesas/rcar-common/gen3-spl.o
 else
-obj-y	:= sm2s-rzg2ul.o ../../renesas/rcar-common/common.o
+obj-y	:= sm2s-rzg2ul.o ../../renesas/rcar-common/common.o boardinfo.o bootsel.o
 endif
