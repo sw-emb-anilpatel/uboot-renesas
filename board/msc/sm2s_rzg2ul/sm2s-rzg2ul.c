@@ -81,7 +81,6 @@ DECLARE_GLOBAL_DATA_PTR;
 
 void s_init(void)
 {
-#if CONFIG_TARGET_SMARC_RZG2UL
 	/* SD1 power control : P0_3 = 1 P6_1 = 1	*/
 	*(volatile u8 *)(PFC_PMC10) &= 0xF7;	/* Port func mode 0b00	*/
 	*(volatile u8 *)(PFC_PMC16) &= 0xFD;	/* Port func mode 0b00	*/
@@ -89,22 +88,7 @@ void s_init(void)
 	*(volatile u16 *)(PFC_PM16) = (*(volatile u16 *)(PFC_PM16) & 0xFFF3) | 0x0008; /* Port output mode 0b10 */
 	*(volatile u8 *)(PFC_P10) = (*(volatile u8 *)(PFC_P10) & 0xF7) | 0x08; /* P0_3  output 1	*/
 	*(volatile u8 *)(PFC_P16) = (*(volatile u8 *)(PFC_P16) & 0xFD) | 0x02; /* P6_1  output 1	*/
-#elif CONFIG_TARGET_RZG2UL_TYPE2_DEV
-	/* SD1 power control : P13_4 = 1 P13_3 = 0 */
-	*(volatile u8 *)(PFC_PMC1D) &= 0xE7;	/* Port func mode 0b0000	*/
-	*(volatile u16 *)(PFC_PM1D) = (*(volatile u16 *)(PFC_PM1D) & 0xFC3F) | 0x0280; /* Port output mode 0b1010 */
-	*(volatile u8 *)(PFC_P1D) = (*(volatile u8 *)(PFC_P1D) & 0xE7) | 0x10; /* P13_4 output 1, P13_3 output 0 */
-#else
-	/* SD1 power control : P18_5 = 1 P6_2 = 1 */
-	*(volatile u8 *)(PFC_PMC16) &= 0xFB;	/* Port func mode 0b00	*/
-	*(volatile u8 *)(PFC_PMC22) &= 0xDF;	/* Port func mode 0b00	*/
-	*(volatile u16 *)(PFC_PM16) = (*(volatile u16 *)(PFC_PM16) & 0xFFCF) | 0x0020; /* Port output mode 0b10 */
-	*(volatile u16 *)(PFC_PM22) = (*(volatile u16 *)(PFC_PM22) & 0xF3FF) | 0x0800; /* Port output mode 0b10 */
-	*(volatile u8 *)(PFC_P16) = (*(volatile u8 *)(PFC_P16) & 0xFB) | 0x04; /* P6_2  output 1	*/
-	*(volatile u8 *)(PFC_P22) = (*(volatile u8 *)(PFC_P22) & 0xDF) | 0x20; /* P18_5 output 1	*/
-#endif
 
-#if CONFIG_TARGET_SMARC_RZG2UL
 	/********************************************************************/
 	/* TODO: Change the voltage setting according to the SW1-3 setting	*/
 	/********************************************************************/
@@ -115,23 +99,6 @@ void s_init(void)
 	*(volatile u32 *)(ETH_MII_RGMII) = (*(volatile u32 *)(ETH_MII_RGMII) & 0xFFFFFFFC);
 	/* ETH CLK */
 	*(volatile u32 *)(CPG_RESET_ETH) = 0x30002;
-#elif CONFIG_TARGET_RZG2UL_TYPE2_DEV
-	/* can go in board_eht_init() once enabled */
-	*(volatile u32 *)(ETH_CH0) = (*(volatile u32 *)(ETH_CH0) & 0xFFFFFFFC) | ETH_PVDD_2500;
-	/* Enable RGMII for ETH0 */
-	*(volatile u32 *)(ETH_MII_RGMII) = (*(volatile u32 *)(ETH_MII_RGMII) & 0xFFFFFFFC);
-	/* ETH CLK */
-	*(volatile u32 *)(CPG_RESET_ETH) = 0x30001;
-#else
-	/* CONFIG_TARGET_RZG2UL_TYPE1_DEV || CONFIG_TARGET_RZG2UL_TYPE1_DDR3L_DEV	*/
-	/* can go in board_eht_init() once enabled */
-	*(volatile u32 *)(ETH_CH0) = (*(volatile u32 *)(ETH_CH0) & 0xFFFFFFFC) | ETH_PVDD_3300;
-	*(volatile u32 *)(ETH_CH1) = (*(volatile u32 *)(ETH_CH1) & 0xFFFFFFFC) | ETH_PVDD_3300;
-	/* Enable RGMII for both ETH{0,1} */
-	*(volatile u32 *)(ETH_MII_RGMII) = (*(volatile u32 *)(ETH_MII_RGMII) & 0xFFFFFFFC);
-	/* ETH CLK */
-	*(volatile u32 *)(CPG_RESET_ETH) = 0x30003;
-#endif
 	/* I2C CLK */
 	*(volatile u32 *)(CPG_RESET_I2C) = 0xF000F;
 	/* I2C pin non GPIO enable */
@@ -196,7 +163,9 @@ int board_early_init_f(void)
 
 int board_init(void)
 {
-#if CONFIG_TARGET_SMARC_RZG2UL
+	printf("sm2s board init...\n");
+#if 0 
+	//CONFIG_TARGET_SMARC_RZG2UL
 	struct udevice *dev;
 	struct udevice *bus;
 	const u8 pmic_bus = 0;
@@ -247,6 +216,7 @@ void reset_cpu(void)
 
 int board_late_init(void)
 {
+	printf("sm2s board late init...\n");
 #ifdef CONFIG_RENESAS_RZG2LWDT
 	rzg2l_reinitr_wdt();
 #endif // CONFIG_RENESAS_RZG2LWDT
