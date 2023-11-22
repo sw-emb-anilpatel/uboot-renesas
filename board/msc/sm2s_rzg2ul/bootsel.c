@@ -18,7 +18,6 @@
 #include <asm/io.h>
 #include <asm/arch/sys_proto.h>
 #include <asm-generic/gpio.h>
-#include <asm/arch/hardware.h>
 #include <dm/uclass.h>
 
 struct boot_dev_descriptor {

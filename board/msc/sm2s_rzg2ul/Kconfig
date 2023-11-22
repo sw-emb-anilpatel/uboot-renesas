@@ -1,3 +1,5 @@
+source "board/msc/common/Kconfig"
+
 config SYS_SOC
 	default "rmobile"
 

@@ -22,8 +22,16 @@
 #include <mmc.h>
 #include <wdt.h>
 #include <rzg2l_wdt.h>
+#include "../common/boardinfo.h"
+#include "../common/boardinfo_fdt.h"
+#include "../common/spl.h"
+
 
 DECLARE_GLOBAL_DATA_PTR;
+
+const board_info_t *binfo = NULL;
+
+#define ENV_FDTFILE_MAX_SIZE 		64
 
 #define PFC_BASE	0x11030000
 
@@ -164,6 +172,7 @@ int board_early_init_f(void)
 int board_init(void)
 {
 	printf("sm2s board init...\n");
+
 #if 0 
 	//CONFIG_TARGET_SMARC_RZG2UL
 	struct udevice *dev;
@@ -196,6 +205,11 @@ int board_init(void)
 	/* adress of boot parameters */
 	gd->bd->bi_boot_params = CONFIG_SYS_TEXT_BASE + 0x50000;
 	board_usb_init();
+	printf("sm2s board usb init...\n");
+	binfo = bi_read();
+        if (binfo == NULL) {
+                printf("Warning: failed to initialize boardinfo!\n");
+        }
 
 	return 0;
 }
@@ -217,9 +231,37 @@ void reset_cpu(void)
 int board_late_init(void)
 {
 	printf("sm2s board late init...\n");
+
 #ifdef CONFIG_RENESAS_RZG2LWDT
 	rzg2l_reinitr_wdt();
 #endif // CONFIG_RENESAS_RZG2LWDT
+
+        if (binfo) {
+                const char *fdt;
+                char buff[ENV_FDTFILE_MAX_SIZE];
+
+#if defined(CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG)
+                env_set("bi_company", bi_get_company(binfo));
+                env_set("bi_form_factor", bi_get_form_factor(binfo));
+                env_set("bi_platform", bi_get_platform(binfo));
+                env_set("bi_processor", bi_get_processor(binfo));
+                env_set("bi_feature", bi_get_feature(binfo));
+                env_set("bi_serial", bi_get_serial(binfo));
+                env_set("bi_revision", bi_get_revision(binfo));
+#endif
+
+#if 0
+                fdt = env_get("fdt_module");
+                if ( (fdt == NULL) || (!strcmp(fdt, "undefined")) ) {
+                        snprintf(buff, ENV_FDTFILE_MAX_SIZE, "%s-%s-%s-%s-%s-module.dtb",
+                                        bi_get_company(binfo), bi_get_form_factor(binfo), bi_get_platform(binfo),
+                                        bi_get_processor(binfo), bi_get_feature(binfo));
+                        env_set("fdt_module", buff);
+						env_set("name_fdt", buff);
+						env_set("default_device_tree", buff);
+                }
+#endif
+        }
 
 	return 0;
 }

@@ -18,7 +18,6 @@
 #include <fdt_support.h>
 #include "boardinfo_fdt.h"
 #include <version.h>
-#include <version_string.h>
 
 static int bi_setprop(void *fdt, int nodeoffset, const char *prop, const char *val)
 {
