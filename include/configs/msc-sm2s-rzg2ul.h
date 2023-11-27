@@ -73,12 +73,12 @@
 
 #define BOOTDEV_SD \
         "boot_sd=" \
-                "run sd_bootargs; mmc dev 0;fatload mmc 0:1 0x48080000 Image-sm2s-rzg2ul.bin;fatload mmc 0:1 0x48000000 Image-r9a07g043u11-smarc.dtb; booti 0x48080000 - 0x48000000" \
+                "run sd_bootargs; mmc dev 0; ext4load mmc 0:2 ${image_addr} boot/Image; ext4load mmc 0:2 ${fdtaddr} boot/${name_fdt}; ext4load mmc 0:2 ${fdtovaddr} boot/${name_overlay}; fdt addr ${fdtaddr}; fdt resize 8192; fdt apply ${fdtovaddr}; booti ${image_addr} - ${fdtaddr}" \
 		"\0"
 
 #define BOOTDEV_EMMC \
         "boot_emmc=" \
-                "run emmc_bootargs; mmc dev 1;fatload mmc 1:1 0x48080000 Image-sm2s-rzg2ul.bin;fatload mmc 1:1 0x48000000 Image-r9a07g043u11-smarc.dtb; booti 0x48080000 - 0x48000000" \
+                "run emmc_bootargs; mmc dev 1; ext4load mmc 1:2 ${image_addr} boot/Image; ext4load mmc 1:2 ${fdtaddr} boot/${name_fdt}; ext4load mmc 1:2 ${fdtovaddr} boot/${name_overlay}; fdt addr ${fdtaddr}; fdt resize 8192; fdt apply ${fdtovaddr}; booti ${image_addr} - ${fdtaddr}" \
                 "\0"
 
 
@@ -88,9 +88,12 @@
 	"usb_pgood_delay=2000\0" \
 	"bootm_size=0x10000000 \0" \
 	"fdtovaddr=0x48c00000 \0" \
-	"fdtaddr=0x48000000 \0" \
-	"sd_bootargs=setenv bootargs rw rootwait earlycon root=/dev/mmcblk1p2 \0" \
-	"emmc_bootargs=setenv bootargs rw rootwait earlycon root=/dev/mmcblk0p2 \0" \
+	"setenv RR_mem 0 \0" \
+	"if test ${RR_mem} -eq 0; then setenv image_addr 0x4A080000; else setenv image_addr 0x40280000; fi \0" \
+	"if test ${RR_mem} -eq 0; then setenv fdtaddr 0x48000000; else setenv image_addr 0x40200000; fi \0" \
+	"setenv name_overlay '' \0" \
+	"sd_bootargs=setenv bootargs rw rootwait earlycon root=/dev/mmcblk0p2 \0" \
+	"emmc_bootargs=setenv bootargs rw rootwait earlycon root=/dev/mmcblk1p2 \0" \
 	"bootimage=unzip 0x4A080000 0x48080000; booti 0x48080000 - 0x48000000 \0" \
 	"bootcmd_check=if mmc dev 1; then run sd1load; else run emmcload; fi \0"
 
