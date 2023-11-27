@@ -71,17 +71,31 @@
 
 /* ENV setting */
 
+#define BOOTDEV_SD \
+        "boot_sd=" \
+                "run sd_bootargs; mmc dev 0;fatload mmc 0:1 0x48080000 Image-sm2s-rzg2ul.bin;fatload mmc 0:1 0x48000000 Image-r9a07g043u11-smarc.dtb; booti 0x48080000 - 0x48000000" \
+		"\0"
+
+#define BOOTDEV_EMMC \
+        "boot_emmc=" \
+                "run emmc_bootargs; mmc dev 1;fatload mmc 1:1 0x48080000 Image-sm2s-rzg2ul.bin;fatload mmc 1:1 0x48000000 Image-r9a07g043u11-smarc.dtb; booti 0x48080000 - 0x48000000" \
+                "\0"
+
+
 #define CONFIG_EXTRA_ENV_SETTINGS \
+	BOOTDEV_SD \
+	BOOTDEV_EMMC \
 	"usb_pgood_delay=2000\0" \
 	"bootm_size=0x10000000 \0" \
-	"prodsdbootargs=setenv bootargs rw rootwait earlycon root=/dev/mmcblk1p2 \0" \
-	"prodemmcbootargs=setenv bootargs rw rootwait earlycon root=/dev/mmcblk0p2 \0" \
+	"fdtovaddr=0x48c00000 \0" \
+	"fdtaddr=0x48000000 \0" \
+	"sd_bootargs=setenv bootargs rw rootwait earlycon root=/dev/mmcblk1p2 \0" \
+	"emmc_bootargs=setenv bootargs rw rootwait earlycon root=/dev/mmcblk0p2 \0" \
 	"bootimage=unzip 0x4A080000 0x48080000; booti 0x48080000 - 0x48000000 \0" \
-	"emmcload=ext4load mmc 0:2 0x48080000 boot/Image;ext4load mmc 0:2 0x48000000 boot/r9a07g043u11-smarc.dtb;run prodemmcbootargs \0" \
-	"sd1load=ext4load mmc 1:2 0x48080000 boot/Image;ext4load mmc 1:2 0x48000000 boot/r9a07g043u11-smarc.dtb;run prodsdbootargs \0" \
 	"bootcmd_check=if mmc dev 1; then run sd1load; else run emmcload; fi \0"
 
-#define CONFIG_BOOTCOMMAND	"env default -a;run bootcmd_check;run bootimage"
+#define CONFIG_BOOTCOMMAND     "if boardinfo complete; then if bootsel; then if run boot_${bootdev}; then; exit; fi; else echo ERR: Aborting boot OS, invalid boot device!; false; fi; else echo ERR: Aborting boot OS, boardinfo is not complete!; false; fi;"
+
 
 /* For board */
 /* Ethernet RAVB */

@@ -6,8 +6,7 @@
 # SPDX-License-Identifier: GPL-2.0+
 #
 
-ifdef CONFIG_SPL_BUILD
-obj-y	:= ../../renesas/rcar-common/gen3-spl.o
-else
-obj-y	:= sm2s-rzg2ul.o ../../renesas/rcar-common/common.o boardinfo.o bootsel.o
-endif
+obj-y   += sm2s-rzg2ul.o
+obj-y   += ../../renesas/rcar-common/common.o
+obj-y   += boardinfo.o
+obj-y   += bootsel.o

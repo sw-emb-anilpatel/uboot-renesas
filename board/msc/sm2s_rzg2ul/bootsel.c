@@ -47,7 +47,7 @@ static int select_boot_dev(void)
 		printf("Error: couldn't get 'boot_sel0' gpio, check your DT.\n");
 		return (-ENODEV);
 	}
-	printf("boot_sel0 value : %d\n", dm_gpio_get_value(desc) << 0);
+	printf("boot_sel0 value : %d\n", dm_gpio_get_value(desc));
 
 	bootsel |= dm_gpio_get_value(desc) << 0;
 
@@ -57,7 +57,7 @@ static int select_boot_dev(void)
 		return (-ENODEV);
 	}
 
-	printf("boot_sel1 value : %d\n", dm_gpio_get_value(desc) << 1);
+	printf("boot_sel1 value : %d\n", dm_gpio_get_value(desc));
 
 	bootsel |= dm_gpio_get_value(desc) << 1;
 
@@ -67,9 +67,11 @@ static int select_boot_dev(void)
 		return (-ENODEV);
 	}
 
-	printf("boot_sel2 value : %d\n", dm_gpio_get_value(desc) << 2);
+	printf("boot_sel2 value : %d\n", dm_gpio_get_value(desc));
 
 	bootsel |= dm_gpio_get_value(desc) << 2;
+
+	printf("boot_sel value : %d\n", bootsel);
 
 	if (bootsel > ARRAY_SIZE(boot_dev)-1 || strlen(boot_dev[bootsel].name) == 0) {
 		printf("Warning: invalid boot device detected, check boot selector.\n");
