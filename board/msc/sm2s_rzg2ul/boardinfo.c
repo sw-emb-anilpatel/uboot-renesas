@@ -55,7 +55,7 @@ const char* bi_get_form_factor(const board_info_t *bi)
 
 const char* bi_get_platform(const board_info_t *bi)
 {
-	return "rzg2ul";
+	return "g2ul";
 }
 
 const char* bi_get_processor(const board_info_t *bi)
