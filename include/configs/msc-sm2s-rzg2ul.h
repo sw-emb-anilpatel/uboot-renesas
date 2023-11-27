@@ -73,12 +73,12 @@
 
 #define BOOTDEV_SD \
         "boot_sd=" \
-                "run sd_bootargs; mmc dev 0; ext4load mmc 0:2 ${image_addr} boot/Image; ext4load mmc 0:2 ${fdtaddr} boot/${name_fdt}; ext4load mmc 0:2 ${fdtovaddr} boot/${name_overlay}; fdt addr ${fdtaddr}; fdt resize 8192; fdt apply ${fdtovaddr}; booti ${image_addr} - ${fdtaddr}" \
+                "run image_addr_check; run fdtaddr_check; run sd_bootargs; mmc dev 0; ext4load mmc 0:2 ${image_addr} boot/Image; ext4load mmc 0:2 ${fdtaddr} boot/${name_fdt}; ext4load mmc 0:2 ${fdtovaddr} boot/${name_overlay}; fdt addr ${fdtaddr}; fdt resize 8192; fdt apply ${fdtovaddr}; booti ${image_addr} - ${fdtaddr}" \
 		"\0"
 
 #define BOOTDEV_EMMC \
         "boot_emmc=" \
-                "run emmc_bootargs; mmc dev 1; ext4load mmc 1:2 ${image_addr} boot/Image; ext4load mmc 1:2 ${fdtaddr} boot/${name_fdt}; ext4load mmc 1:2 ${fdtovaddr} boot/${name_overlay}; fdt addr ${fdtaddr}; fdt resize 8192; fdt apply ${fdtovaddr}; booti ${image_addr} - ${fdtaddr}" \
+                "run image_addr_check; run fdtaddr_check; run emmc_bootargs; mmc dev 1; ext4load mmc 1:2 ${image_addr} boot/Image; ext4load mmc 1:2 ${fdtaddr} boot/${name_fdt}; ext4load mmc 1:2 ${fdtovaddr} boot/${name_overlay}; fdt addr ${fdtaddr}; fdt resize 8192; fdt apply ${fdtovaddr}; booti ${image_addr} - ${fdtaddr}" \
                 "\0"
 
 
@@ -88,10 +88,10 @@
 	"usb_pgood_delay=2000\0" \
 	"bootm_size=0x10000000 \0" \
 	"fdtovaddr=0x48c00000 \0" \
-	"setenv RR_mem 0 \0" \
-	"if test ${RR_mem} -eq 0; then setenv image_addr 0x4A080000; else setenv image_addr 0x40280000; fi \0" \
-	"if test ${RR_mem} -eq 0; then setenv fdtaddr 0x48000000; else setenv image_addr 0x40200000; fi \0" \
-	"setenv name_overlay '' \0" \
+	"RR_mem=0 \0" \
+	"image_addr_check=if test ${RR_mem} -eq 0; then setenv image_addr 0x4A080000; else setenv image_addr 0x40280000; fi \0" \
+	"fdtaddr_check=if test ${RR_mem} -eq 0; then setenv fdtaddr 0x48000000; else setenv image_addr 0x40200000; fi \0" \
+	"name_overlay='' \0" \
 	"sd_bootargs=setenv bootargs rw rootwait earlycon root=/dev/mmcblk0p2 \0" \
 	"emmc_bootargs=setenv bootargs rw rootwait earlycon root=/dev/mmcblk1p2 \0" \
 	"bootimage=unzip 0x4A080000 0x48080000; booti 0x48080000 - 0x48000000 \0" \
