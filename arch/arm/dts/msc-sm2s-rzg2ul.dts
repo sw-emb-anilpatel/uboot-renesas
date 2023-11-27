@@ -29,28 +29,40 @@
 		/* first 128MB is reserved for secure area. */
 		reg = <0 0x48000000 0 0x78000000>;
 	};
+};
 
+&soc {
+	/delete-node/ ethernet@11c30000;
+};
+
+&P7 {
+	boot_sel0 {
+	        gpio-hog;
+	        gpios = <4 GPIO_ACTIVE_HIGH>;
+	        input;
+	        line-name = "boot_sel0";
+	};
+};
+
+&P8 {
+	boot_sel1 {
+	        gpio-hog;
+	        gpios = <4 GPIO_ACTIVE_HIGH>;
+	        input;
+	        line-name = "boot_sel1";
+	};
+};
+
+&P10 {
+	boot_sel2 {
+	        gpio-hog;
+	        gpios = <0 GPIO_ACTIVE_HIGH>;
+	        input;
+	        line-name = "boot_sel2";
+	};
 };
 
 &pinctrl {
-	eth1_pins: eth1 {
-		pinmux = <RZG2L_PINMUX(7, 0, 1)>,
-				<RZG2L_PINMUX(7, 1, 1)>,
-				<RZG2L_PINMUX(7, 2, 1)>,
-				<RZG2L_PINMUX(7, 3, 1)>,
-				<RZG2L_PINMUX(7, 4, 1)>,
-				<RZG2L_PINMUX(8, 0, 1)>,
-				<RZG2L_PINMUX(8, 4, 1)>,
-				<RZG2L_PINMUX(9, 0, 1)>,
-				<RZG2L_PINMUX(9, 1, 1)>,
-				<RZG2L_PINMUX(9, 2, 1)>,
-				<RZG2L_PINMUX(9, 3, 1)>,
-				<RZG2L_PINMUX(10, 0, 1)>,
-				<RZG2L_PINMUX(10, 2, 1)>,
-				<RZG2L_PINMUX(10, 3, 1)>,
-				<RZG2L_PINMUX(10, 4, 1)>;
-	};
-
 	i2c0_pins: i2c0 {
 		pins = "RIIC0_SDA", "RIIC0_SCL";
 		input-enable;
@@ -87,18 +99,6 @@
 	*/
 	bus-width = <4>;
 	status = "okay";
-};
-
-&eth1 {
-	pinctrl-names = "default";
-	pinctrl-0 = <&eth1_pins>;
-	phy-handle = <&phy1>;
-	phy-mode = "rgmii";
-	status = "okay";
-
-	phy1: ethernet-phy@7 {
-		reg = <7>;
-	};
 };
 
 &i2c0 {

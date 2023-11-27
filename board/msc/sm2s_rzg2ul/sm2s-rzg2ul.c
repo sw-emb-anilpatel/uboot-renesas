@@ -102,8 +102,8 @@ void s_init(void)
 	/********************************************************************/
 	/* can go in board_eht_init() once enabled */
 	*(volatile u32 *)(ETH_CH0) = (*(volatile u32 *)(ETH_CH0) & 0xFFFFFFFC) | ETH_PVDD_3300;
-	*(volatile u32 *)(ETH_CH1) = (*(volatile u32 *)(ETH_CH1) & 0xFFFFFFFC) | ETH_PVDD_1800;
-	/* Enable RGMII for both ETH{0,1} */
+	// *(volatile u32 *)(ETH_CH1) = (*(volatile u32 *)(ETH_CH1) & 0xFFFFFFFC) | ETH_PVDD_1800;
+	/* Enable RGMII for only ETH{0} */
 	*(volatile u32 *)(ETH_MII_RGMII) = (*(volatile u32 *)(ETH_MII_RGMII) & 0xFFFFFFFC);
 	/* ETH CLK */
 	*(volatile u32 *)(CPG_RESET_ETH) = 0x30002;
@@ -205,7 +205,6 @@ int board_init(void)
 	/* adress of boot parameters */
 	gd->bd->bi_boot_params = CONFIG_SYS_TEXT_BASE + 0x50000;
 	board_usb_init();
-	printf("sm2s board usb init...\n");
 	binfo = bi_read();
         if (binfo == NULL) {
                 printf("Warning: failed to initialize boardinfo!\n");
@@ -250,7 +249,6 @@ int board_late_init(void)
                 env_set("bi_revision", bi_get_revision(binfo));
 #endif
 
-#if 0
                 fdt = env_get("fdt_module");
                 if ( (fdt == NULL) || (!strcmp(fdt, "undefined")) ) {
                         snprintf(buff, ENV_FDTFILE_MAX_SIZE, "%s-%s-%s-%s-%s-module.dtb",
@@ -260,7 +258,6 @@ int board_late_init(void)
 						env_set("name_fdt", buff);
 						env_set("default_device_tree", buff);
                 }
-#endif
         }
 
 	return 0;
