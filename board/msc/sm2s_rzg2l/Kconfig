@@ -1,0 +1,13 @@
+source "board/msc/common/Kconfig"
+
+config SYS_SOC
+	default "rmobile"
+
+config SYS_BOARD
+	default "sm2s_rzg2l"
+
+config SYS_VENDOR
+	default "msc"
+
+config SYS_CONFIG_NAME
+	default "msc-sm2s-rzg2l"
