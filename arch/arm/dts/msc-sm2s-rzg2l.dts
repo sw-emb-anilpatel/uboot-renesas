@@ -1,0 +1,181 @@
+// SPDX-License-Identifier: GPL-2.0
+/*
+ * Device Tree Source for the Avnet sm2s-rzg2l board
+ *
+ * Copyright (C) 2022-23 AVNET Embedded, MSC Technologies GmbH
+ */
+
+/dts-v1/;
+#include <dt-bindings/gpio/gpio.h>
+#include "r9a07g044l.dtsi"
+#include "r9a07g044l-u-boot.dtsi"
+#include <dt-bindings/pinctrl/rzg2l-pinctrl.h>
+
+/ {
+	model = "sm2s-rzg2l";
+	compatible = "renesas,r9a07g044l", "renesas,rzg2l";
+
+	aliases {
+		serial0 = &scif0;
+		spi0 = &spibsc;
+	};
+
+	chosen {
+		stdout-path = "serial0:115200n8";
+	};
+
+	memory@48000000 {
+		device_type = "memory";
+		/* first 128MB is reserved for secure area. */
+		reg = <0 0x48000000 0 0x18000000>;
+	};
+};
+
+&soc {
+	/delete-node/ ethernet@11c30000;
+};
+
+&P3 {
+	boot_sel0 {
+	        gpio-hog;
+	        gpios = <0 GPIO_ACTIVE_HIGH>;
+	        input;
+	        line-name = "boot_sel0";
+	};
+
+	boot_sel1 {
+	        gpio-hog;
+	        gpios = <1 GPIO_ACTIVE_HIGH>;
+	        input;
+	        line-name = "boot_sel1";
+	};
+};
+
+&P17 {
+	boot_sel2 {
+	        gpio-hog;
+	        gpios = <0 GPIO_ACTIVE_HIGH>;
+	        input;
+	        line-name = "boot_sel2";
+	};
+};
+
+
+&pinctrl {
+	eth0_pins: eth0 {
+		pinmux = <RZG2L_PINMUX(20, 0, 1)>,
+				<RZG2L_PINMUX(20, 1, 1)>,
+				<RZG2L_PINMUX(20, 2, 1)>,
+				<RZG2L_PINMUX(21, 0, 1)>,
+				<RZG2L_PINMUX(21, 1, 1)>,
+				<RZG2L_PINMUX(22, 0, 1)>,
+				<RZG2L_PINMUX(22, 1, 1)>,
+				<RZG2L_PINMUX(23, 0, 1)>,
+				<RZG2L_PINMUX(23, 1, 1)>,
+				<RZG2L_PINMUX(24, 0, 1)>,
+				<RZG2L_PINMUX(24, 1, 1)>,
+				<RZG2L_PINMUX(25, 0, 1)>,
+				<RZG2L_PINMUX(25, 1, 1)>,
+				<RZG2L_PINMUX(26, 0, 1)>,
+				<RZG2L_PINMUX(26, 1, 1)>,
+				<RZG2L_PINMUX(27, 0, 1)>,
+				<RZG2L_PINMUX(27, 1, 1)>,
+				<RZG2L_PINMUX(28, 0, 1)>,
+				<RZG2L_PINMUX(28, 1, 1)>;
+	};
+
+};
+
+&xinclk {
+        clock-frequency = <24000000>;
+};
+
+&scif0 {
+	status = "okay";
+	clock = <100000000>;
+};
+
+&sdhi0 {
+	bus-width = <8>;
+	status = "okay";
+	/* This is used for interface that support both eMMC and SD in board */
+	mutual-channel;
+};
+
+&sdhi1 {
+	bus-width = <4>;
+	status = "okay";
+};
+
+&eth0 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&eth0_pins>;
+	status = "okay";
+
+	phy-handle = <&phy0>;
+	phy-mode = "rgmii";
+	phy0: ethernet-phy@7 {
+		reg = <7>;
+	};
+};
+
+&i2c0 {
+	status = "okay";
+	clock-frequency = <100000>;
+	pinctrl-names = "default";
+
+	module_eeprom@50 {
+		compatible = "atmel,24c64";
+		reg = <0x50>;
+		pagesize = <32>;
+	};
+
+	module_eeprom@57 {
+		compatible = "atmel,24c64";
+		reg = <0x57>;
+		pagesize = <32>;
+	};
+};
+
+&i2c1 {
+	status = "okay";
+	pinctrl-names = "default";
+	clock-frequency = <100000>;
+
+	module_eeprom@57 {
+		compatible = "atmel,24c64";
+		reg = <0x57>;
+		pagesize = <32>;
+	};
+};
+
+&spibsc {
+	num-cs = <1>;
+	status = "okay";
+	spi-max-frequency = <40000000>;
+	#address-cells = <1>;
+	#size-cells = <0>;
+	flash0: spi-flash@0 {
+		#address-cells = <1>;
+		#size-cells = <1>;
+		compatible = "spi-flash", "jedec,spi-nor";
+		spi-max-frequency = <40000000>;
+		spi-tx-bus-width = <1>;
+		spi-rx-bus-width = <1>;
+		reg = <0>;
+		status = "okay";
+	};
+};
+
+&ehci0 {
+	status = "okay";
+};
+
+&ehci1 {
+	status = "okay";
+};
+
+&wdt0 {
+	status = "okay";
+	timeout-sec = <60>;
+};
