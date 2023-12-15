@@ -1,3 +1,5 @@
+if TARGET_SM2S_RZG2L
+
 source "board/msc/common/Kconfig"
 
 config SYS_SOC
@@ -11,3 +13,5 @@ config SYS_VENDOR
 
 config SYS_CONFIG_NAME
 	default "msc-sm2s-rzg2l"
+
+endif
