@@ -78,7 +78,7 @@
 
 #define BOOTDEV_EMMC \
         "boot_emmc=" \
-                "run image_addr_check; run fdtaddr_check; run sd_bootargs; mmc dev 1; ext4load mmc 1:2 ${fdtaddr} boot/${name_fdt}; for overlay in $name_overlay; do ext4load mmc 1:2 ${fdtovaddr} boot/${overlay}; fdt addr ${fdtaddr}; fdt resize 8192; fdt apply ${fdtovaddr}; done; ext4load mmc 1:2 ${image_addr} boot/Image; booti ${image_addr} - ${fdtaddr}" \
+                "run image_addr_check; run fdtaddr_check; run emmc_bootargs; mmc dev 1; ext4load mmc 1:2 ${fdtaddr} boot/${name_fdt}; for overlay in $name_overlay; do ext4load mmc 1:2 ${fdtovaddr} boot/${overlay}; fdt addr ${fdtaddr}; fdt resize 8192; fdt apply ${fdtovaddr}; done; ext4load mmc 1:2 ${image_addr} boot/Image; booti ${image_addr} - ${fdtaddr}" \
 		"\0"
 
 
