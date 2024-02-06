@@ -17,11 +17,12 @@
 
 	aliases {
 		serial0 = &scif0;
+		serial1 = &scif1;
 		spi0 = &spibsc;
 	};
 
 	chosen {
-		stdout-path = "serial0:115200n8";
+		stdout-path = "serial1:115200n8";
 	};
 
 	memory@48000000 {
@@ -72,6 +73,11 @@
 		pins = "RIIC1_SDA", "RIIC1_SCL";
 		input-enable;
 	};
+
+	scif1_pins: scif1 {
+		pinmux = <RZG2L_PINMUX(8, 0, 3)>, /* SCIF1_RXD */
+			<RZG2L_PINMUX(8, 1, 3)>;/*SCIF1_TXD*/
+	};
 };
 
 &xinclk {
@@ -81,6 +87,13 @@
 &scif0 {
 	status = "okay";
 	clock = <100000000>;
+};
+
+&scif1 {
+	status = "okay";
+	clock = <100000000>;
+	pinctrl-0 = <&scif1_pins>;
+	pinctrl-names = "default";
 };
 
 &sdhi0 {
