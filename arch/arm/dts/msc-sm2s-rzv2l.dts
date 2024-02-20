@@ -9,6 +9,8 @@
 #include "r9a07g054l.dtsi"
 #include "r9a07g054l-u-boot.dtsi"
 #include <dt-bindings/pinctrl/rzv2l-pinctrl.h>
+#include <dt-bindings/net/ti-dp83867.h>
+
 
 / {
 	model = "sm2s-rzv2l";
@@ -113,9 +115,14 @@
 	phy-mode = "rgmii";
 	status = "okay";
 
-	phy0: ethernet-phy@7 {
-		reg = <7>;
-	};
+	phy0: ethernet-phy@0 {
+                compatible = "ethernet-phy-id2000.a231";
+                reg = <0>;
+                ti,rx-internal-delay = <DP83867_RGMIIDCTL_2_00_NS>;
+                ti,tx-internal-delay = <DP83867_RGMIIDCTL_2_00_NS>;
+                ti,fifo-depth = <DP83867_PHYCR_FIFO_DEPTH_4_B_NIB>;
+                ti,min-output-impedance;
+        };
 };
 
 &i2c0 {
