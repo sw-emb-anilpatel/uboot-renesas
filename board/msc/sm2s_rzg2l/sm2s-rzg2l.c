@@ -91,7 +91,7 @@ void s_init(void)
 	/* Enable RGMII for both ETH{0,1} */
 	*(volatile u32 *)(ETH_MII_RGMII) = (*(volatile u32 *)(ETH_MII_RGMII) & 0xFFFFFFFC);
 	/* ETH CLK */
-	*(volatile u32 *)(CPG_RESET_ETH) = 0x30003;
+	*(volatile u32 *)(CPG_RESET_ETH) = 0x30001;
 	/* I2C CLK */
 	*(volatile u32 *)(CPG_RESET_I2C) = 0xF000F;
 	/* I2C pin non GPIO enable */
