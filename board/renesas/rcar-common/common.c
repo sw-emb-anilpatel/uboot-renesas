@@ -15,6 +15,8 @@
 #include <asm/arch/rmobile.h>
 #include <linux/libfdt.h>
 
+#define DRAM_RSV_SIZE 0x08000000    // 128MB  change value based on Reserved memory
+
 #ifdef CONFIG_RCAR_GEN3
 
 #if defined(CONFIG_TARGET_HIHOPE_RZG2)
@@ -29,6 +31,21 @@ DECLARE_GLOBAL_DATA_PTR;
 /* If the firmware passed a device tree use it for U-Boot DRAM setup. */
 extern u64 rcar_atf_boot_args[];
 
+static uint32_t sdram_size[2] = {0};
+
+int set_board_sdram_size(uint32_t size0, uint32_t size1)
+{
+	if ( (size0 <= 0) && (size1 <=0) )
+		return -EINVAL;
+
+	sdram_size[0] = size0;
+	sdram_size[1] = size1;
+
+	printf("set SD RAM size = 0x%llx 0x%llx\n", sdram_size[0], sdram_size[1]);
+
+	return 0;
+}
+
 #if !(defined(CONFIG_R9A07G044L) || defined(CONFIG_R9A07G044C) || defined(CONFIG_R9A07G054L) || defined(CONFIG_R9A07G043U))
 int fdtdec_board_setup(const void *fdt_blob)
 {
@@ -41,7 +58,19 @@ int fdtdec_board_setup(const void *fdt_blob)
 
 int dram_init(void)
 {
-	return fdtdec_setup_mem_size_base();
+	int ret;
+	ret = fdtdec_setup_mem_size_base();
+
+#if defined (CONFIG_TARGET_SM2S_RZG2UL)
+	// Forcefully set memory node based on boardinfo feature version
+	// get som_varient and feature list and set DRAM based on that
+	// i.e. gd->ram_size = 0x18000000; 
+
+	if ( (sdram_size[0] > 0) || (sdram_size[1] > 0) )
+		gd->ram_size = sdram_size[0] + sdram_size[1] - DRAM_RSV_SIZE;  // total memory - reserved memory
+
+#endif
+	return ret;
 }
 
 int dram_init_banksize(void)
@@ -51,7 +80,22 @@ int dram_init_banksize(void)
 	struct pt_regs regs;
 #endif
 
+	int ret;
+
 	fdtdec_setup_memory_banksize();
+
+#if defined (CONFIG_TARGET_SM2S_RZG2UL)
+	// Forcefully set memory node based on boardinfo feature version
+	// get som_varient and feature files and set DRAM based on that
+	// i.e. gd->bd->bi_dram[bank].size = 0x18000000; 
+
+	if (sdram_size[0] > 0)
+		gd->bd->bi_dram[0].size = sdram_size[0] - DRAM_RSV_SIZE;
+
+	if (sdram_size[1] > 0)
+		gd->bd->bi_dram[1].size = sdram_size[1];
+
+#endif	
 
 #if defined (CONFIG_TARGET_HIHOPE_RZG2)
 	if (rmobile_get_cpu_type() == RMOBILE_CPU_TYPE_R8A7795) {

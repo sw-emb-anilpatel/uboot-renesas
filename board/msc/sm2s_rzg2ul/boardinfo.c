@@ -27,7 +27,7 @@ int read_boardinfo(int offset, uint8_t *buffer, int size)
 
 	ret = i2c_get_chip_for_busnum(I2C_GP, BI_EEPROM_I2C_ADDR, 2, &eeprom);
 	if (ret < 0) {
-		puts("ID eeprom not found\n");
+		printf("ID eeprom not found\n");
 		return ret;
 	}
 
@@ -41,7 +41,7 @@ int write_boardinfo(int offset, uint8_t *buffer, int size)
 
 	ret = i2c_get_chip_for_busnum(I2C_GP, BI_EEPROM_I2C_ADDR, 2, &eeprom);
 	if (ret < 0) {
-		puts("ID eeprom not found\n");
+		printf("ID eeprom not found\n");
 		return ret;
 	}
 

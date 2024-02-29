@@ -24,12 +24,23 @@
 #include <rzg2l_wdt.h>
 #include "../common/boardinfo.h"
 #include "../common/boardinfo_fdt.h"
-#include "../common/spl.h"
+#include "../common/som_variant.h"
+#include <serial.h>
 
 
 DECLARE_GLOBAL_DATA_PTR;
 
 const board_info_t *binfo = NULL;
+
+static variant_record_t variants[] = {
+		FEATURE_RECORD ("92NON70E",
+				REVISION_RECORD("10", SZ_512M, 0),
+				),
+		FEATURE_RECORD ("14N02C1I",
+				REVISION_RECORD("10", SZ_2G, 0),
+				),
+		{ NULL },
+};
 
 #define ENV_FDTFILE_MAX_SIZE 		64
 
@@ -86,6 +97,55 @@ const board_info_t *binfo = NULL;
 
 /* WDT */
 #define WDT_INDEX		0
+
+typedef struct variant_key
+{
+	char	feature[BI_FEATURE_LEN + 1];
+	char	revision[BI_REVISION_LEN + 1];
+} t_variant_key;
+
+
+static int read_string(char* buff, int buff_len)
+{
+	int idx = 0;
+
+	while (idx < buff_len) {
+		buff[idx] = serial_getc();
+		putc(buff[idx]);
+		if (buff[idx] == '\r' || buff[idx] == '\n' || buff[idx] == ' ')
+			break;
+		idx++;
+	}
+
+	buff[idx] = '\0';
+
+	return idx;
+}
+
+static int readin_variant_key(t_variant_key *key)
+{
+	int ret;
+
+	printf("Enter feature key for basic board initialization and hit <enter>.\n");
+	printf("feature? > ");
+
+	ret = read_string(key->feature, sizeof(key->feature));
+	if (ret == 0)
+		return -EINVAL;
+
+	printf("\n");
+
+	printf("Enter revision key for basic board initialization and hit <enter>.\n");
+	printf("revision? > ");
+
+	ret = read_string(key->revision, sizeof(key->revision));
+	if (ret == 0)
+		return -EINVAL;
+
+	printf("\n");
+
+	return 0;
+}
 
 void s_init(void)
 {
@@ -171,7 +231,9 @@ int board_early_init_f(void)
 
 int board_init(void)
 {
-	printf("sm2s board init...\n");
+	t_variant_key key;
+	bool input_binfo = false;
+	const revision_record_t *rev;
 
 #if 0 
 	//CONFIG_TARGET_SMARC_RZG2UL
@@ -206,10 +268,59 @@ int board_init(void)
 	gd->bd->bi_boot_params = CONFIG_SYS_TEXT_BASE + 0x50000;
 	board_usb_init();
 	binfo = bi_read();
-        if (binfo == NULL) {
-                printf("Warning: failed to initialize boardinfo!\n");
-        }
+	if (binfo == NULL) {
+			printf("Warning: failed to initialize boardinfo!\n");
+	} else{
+		rev = find_revision_record(variants, bi_get_feature(binfo), bi_get_revision(binfo));
+		if (rev == NULL) {
+			printf("Warning: the content of the ID-EEPROM indicates \n"
+					"   a module variant that is not supported by the software used!\n");
+			printf("The current content is: \n");
+			bi_print(binfo);
 
+			printf("If the feature and revision keys should now be overwritten \n"
+					"   with new contents press <o|O>? \n");
+
+			while (true) {
+				char ch = serial_getc();
+
+				if (ch == 'o' || ch == 'O')
+					break;
+
+				hang();
+			}
+
+			input_binfo = true;
+		}
+	}
+
+	if (input_binfo) {
+		while (true) {
+			print_variants(variants);
+
+			if (readin_variant_key(&key) == 0) {
+				rev = find_revision_record(variants, key.feature, key.revision);
+				if (rev) {
+					bi_set_feature(binfo, key.feature);
+					bi_set_revision(binfo, key.revision);
+
+					if (bi_save(binfo)) {
+						printf("Error: the variant information could not be saved!\n");
+					}
+					else
+						break;
+				}
+			}
+		}
+	}
+
+	if (rev && (rev->dram_size[0] > 0) ) 
+	{
+		//updates ram size and reinit
+		set_board_sdram_size(rev->dram_size[0], rev->dram_size[1]);
+
+		dram_init_banksize();
+	}
 	return 0;
 }
 

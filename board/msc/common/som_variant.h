@@ -14,16 +14,9 @@
  * GNU General Public License for more details.
  */
 
-struct dram_timing_info;
-
-typedef struct dram_config {
-	uint32_t				size[2];
-	struct dram_timing_info *timing;
-} dram_config_t;
-
 typedef struct revision_record {
 	const char *			revision_tag;
-	dram_config_t			dram_cfg;
+	uint32_t				dram_size[2];
 } revision_record_t;
 
 typedef struct variant_record {
@@ -31,13 +24,10 @@ typedef struct variant_record {
 	revision_record_t 		revisions[10];
 } variant_record_t;
 
-#define REVISION_RECORD(REVISION, DRAM_SIZE0, DRAM_SIZE1, DRAM_TIMING) \
+#define REVISION_RECORD(REVISION, DRAM_SIZE0, DRAM_SIZE1) \
 		{ \
 			.revision_tag	= REVISION, \
-			.dram_cfg		= { \
-				.size			= { DRAM_SIZE0, DRAM_SIZE1 }, \
-				.timing			= &DRAM_TIMING, \
-			}, \
+			.dram_size		= { DRAM_SIZE0, DRAM_SIZE1 } \
 		}
 
 #define FEATURE_RECORD(FEATURE, ...) \
